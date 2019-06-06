@@ -662,8 +662,13 @@ void start_server(int port, char *local_address) {
 		SSL_set_bio(ssl, bio, bio);
 		SSL_set_options(ssl, SSL_OP_COOKIE_EXCHANGE);
 
-		while (DTLSv1_listen(ssl, (BIO_ADDR *) &client_addr) <= 0);
-
+		int retval = 0;
+		while (retval <= 0) {
+			retval = DTLSv1_listen(ssl, (BIO_ADDR *) &client_addr);
+			if (veryverbose) {
+				printf("DTLSv1_listen() : %d\n", retval);
+			}
+		}
 		info = (struct pass_info*) malloc (sizeof(struct pass_info));
 		memcpy(&info->server_addr, &server_addr, sizeof(struct sockaddr_storage));
 		memcpy(&info->client_addr, &client_addr, sizeof(struct sockaddr_storage));
